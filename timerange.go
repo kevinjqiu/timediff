@@ -44,5 +44,19 @@ func (trs TimeRanges) Swap(i, j int) {
 func (trs TimeRanges) Subtract(other TimeRanges) TimeRanges {
 	sort.Sort(trs)
 	sort.Sort(other)
-	return TimeRanges{}
+
+	timeRanges := TimeRanges{}
+	var i, j int // i is the index for trs. j is the index for other
+	for {
+		if j >= len(other) {
+			break
+		}
+		i += 1
+		j += 1
+	}
+	// Append the remaining ranges of trs to the return value
+	for k := 0; k < len(trs); k++ {
+		timeRanges = append(timeRanges, trs[k])
+	}
+	return timeRanges
 }
