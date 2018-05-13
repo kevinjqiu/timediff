@@ -221,11 +221,12 @@ func (trs TimeRanges) Subtract(subtractors TimeRanges) TimeRanges {
 		diff = tr.Subtract(subtractor)
 
 		trs = trs.ReplaceAt(i, diff.result)
+		subtractors = subtractors.ReplaceAt(j, diff.remainingSubtractor)
+
 		if len(diff.result) >= 1 && diff.result[0] == tr {
 			i++
 			continue
 		}
-		subtractors = subtractors.ReplaceAt(j, diff.remainingSubtractor)
 		if len(diff.remainingSubtractor) == 1 && diff.remainingSubtractor[0] == subtractor {
 			j++
 			continue
