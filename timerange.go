@@ -89,15 +89,15 @@ Let's denote `tr1(start=s1, end=e1)` and `tr2(start=e2, end=e2)` be the two Time
 	result          s1-----------------e1
 	remaining                              s2-----e2
 */
-func (tr TimeRange) Subtract(other TimeRange) TimeRangeSubtractionResult {
+func (tr TimeRange) Subtract(subtractor TimeRange) TimeRangeSubtractionResult {
 	result := TimeRangeSubtractionResult{
 		result:              TimeRanges{},
 		remainingSubtractor: TimeRanges{},
 	}
 	s1 := tr.start
-	s2 := other.start
+	s2 := subtractor.start
 	e1 := tr.end
-	e2 := other.end
+	e2 := subtractor.end
 
 	switch {
 	case s1.Equal(s2) && e1.Equal(e2):
@@ -140,6 +140,20 @@ func (tr TimeRange) String() string {
 // TimeRanges represents a list of TimeRanges
 type TimeRanges []TimeRange
 
+// ReplaceAt replaces the element at idx with elements in the newTrs
+func (trs TimeRanges) ReplaceAt(idx int, newTrs TimeRanges) TimeRanges {
+	result := append(trs[0:idx], newTrs...)
+	if idx <= len(trs)-1 {
+		result = append(result, trs[idx+1:len(trs)]...)
+	}
+	return result
+}
+
+// IsEmpty returns true if the TimeRanges slice is empty
+func (trs TimeRanges) IsEmpty() bool {
+	return trs.Len() == 0
+}
+
 // Method to satisfy the Sort interface
 func (trs TimeRanges) Len() int {
 	return len(trs)
@@ -161,24 +175,36 @@ func (trs TimeRanges) Swap(i, j int) {
 	trs[i], trs[j] = trs[j], trs[i]
 }
 
-// Subtract two TimeRanges object
-func (trs TimeRanges) Subtract(other TimeRanges) TimeRanges {
+// Subtract two TimeRanges object, returns a new TimeRanges object containing the result
+func (trs TimeRanges) Subtract(subtractors TimeRanges) TimeRanges {
 	sort.Sort(trs)
-	sort.Sort(other)
+	sort.Sort(subtractors)
 
-	timeRanges := TimeRanges{}
-	var i, j int // i is the index for trs. j is the index for other
+	var (
+		i, j int
+		diff TimeRangeSubtractionResult
+	)
 	for {
-		if j >= len(other) {
+		if i >= len(trs) {
+			break
+		}
+		if j >= len(subtractors) {
 			break
 		}
 
-		i++
-		j++
+		tr := trs[i]
+		subtractor := subtractors[j]
+		diff = tr.Subtract(subtractor)
+		trs = trs.ReplaceAt(i, diff.result)
+		subtractors = subtractors.ReplaceAt(j, diff.remainingSubtractor)
+		fmt.Printf("i=%d\n", i)
+		fmt.Printf("j=%d\n", j)
+		fmt.Printf("tr=%v\n", tr)
+		fmt.Printf("subtractor=%v\n", subtractor)
+		fmt.Printf("diff=%v\n", diff)
+		fmt.Println("-----------------")
+		fmt.Printf("trs=%v\n", trs)
+		fmt.Printf("subtractors=%v\n", subtractors)
 	}
-	// Append the remaining ranges of trs to the return value
-	for k := 0; k < len(trs); k++ {
-		timeRanges = append(timeRanges, trs[k])
-	}
-	return timeRanges
+	return trs
 }
