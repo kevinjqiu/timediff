@@ -6,14 +6,19 @@ import (
 	"time"
 )
 
+type TimeRangeSubtractionResult struct {
+	result              TimeRanges
+	remainingSubtractor TimeRanges
+}
+
 // TimeRange represents a single TimeRange with start and end time
 type TimeRange struct {
 	start time.Time
 	end   time.Time
 }
 
-func (tr TimeRange) Subtract(other TimeRange) TimeRange {
-	return TimeRange{}
+func (tr TimeRange) Subtract(other TimeRange) TimeRangeSubtractionResult {
+	return TimeRangeSubtractionResult{}
 }
 
 func (tr TimeRange) String() string {
@@ -51,6 +56,7 @@ func (trs TimeRanges) Subtract(other TimeRanges) TimeRanges {
 		if j >= len(other) {
 			break
 		}
+
 		i += 1
 		j += 1
 	}

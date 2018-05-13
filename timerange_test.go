@@ -22,6 +22,86 @@ func makeTimeRangeHHMM(start string, end string) TimeRange {
 	}
 }
 
+// Tests for TimeRange.Subtract
+// TR1:                |-------------|
+// TR2:                |-------------|
+// Result:             []
+// TR2 Remaining:      []
+func TestTimeRangeSubtractionSameRange(t *testing.T) {
+	tr1 := makeTimeRangeHHMM("09:00", "10:00")
+	tr2 := makeTimeRangeHHMM("09:00", "10:00")
+	diff := tr1.Subtract(tr2)
+	assert.Equal(t, diff.result, TimeRanges{})
+	assert.Equal(t, diff.remainingSubtractor, TimeRanges{})
+}
+
+// TR1:                |-------------|
+// TR2:            |----------------------|
+// Result:         []
+// TR2 Remaining:  |---|             |----|
+func TestTimeRangeSubtractionTR2EncompassesTR1(t *testing.T) {
+	tr1 := makeTimeRangeHHMM("09:00", "10:00")
+	tr2 := makeTimeRangeHHMM("08:00", "11:00")
+	diff := tr1.Subtract(tr2)
+	assert.Equal(t, diff.result, TimeRanges{})
+	assert.Equal(t, diff.remainingSubtractor, TimeRanges{
+		makeTimeRangeHHMM("08:00", "09:00"),
+		makeTimeRangeHHMM("09:00", "11:00"),
+	})
+}
+
+// TR1:            |----------------------|
+// TR2:                |-------------|
+// Result:         |---|             |----|
+// TR2 Remaining:  []
+func TestTimeRangeSubtractionTR2BisectsTR1(t *testing.T) {
+	tr1 := makeTimeRangeHHMM("08:00", "11:00")
+	tr2 := makeTimeRangeHHMM("09:00", "10:00")
+	diff := tr1.Subtract(tr2)
+	assert.Equal(t, diff.result, TimeRanges{
+		makeTimeRangeHHMM("08:00", "09:00"),
+		makeTimeRangeHHMM("09:00", "11:00"),
+	})
+	assert.Equal(t, diff.remainingSubtractor, TimeRanges{})
+}
+
+// TR1:            |-----|
+// TR2:                    |-------------|
+// Result:         |-----|
+// TR2 Remaining:          |-------------|
+func TestTimeRangeSubtractionTR2DoesNotIntersectTR1(t *testing.T) {
+	tr1 := makeTimeRangeHHMM("08:00", "11:00")
+	tr2 := makeTimeRangeHHMM("12:00", "15:00")
+	diff := tr1.Subtract(tr2)
+	assert.Equal(t, diff.result, TimeRanges{tr1})
+	assert.Equal(t, diff.remainingSubtractor, TimeRanges{tr2})
+}
+
+// TR1:            |--------|
+// TR2:                |-------------|
+// Result:         |---|
+// TR2 Remaining:           |--------|
+func TestTimeRangeSubtractionTR2OverlapsAndIsLaterThanTR1(t *testing.T) {
+	tr1 := makeTimeRangeHHMM("08:00", "11:00")
+	tr2 := makeTimeRangeHHMM("12:00", "15:00")
+	diff := tr1.Subtract(tr2)
+	assert.Equal(t, diff.result, tr1)
+	assert.Equal(t, diff.remainingSubtractor, tr2)
+}
+
+// TR1:                    |--------|
+// TR2:            |-------------|
+// Result:                       |--|
+// TR2 Remaining:  |-------|
+func TestTimeRangeSubtractionTR2OverlapsAndIsEarlierThanTR1(t *testing.T) {
+	tr1 := makeTimeRangeHHMM("08:00", "11:00")
+	tr2 := makeTimeRangeHHMM("07:00", "09:00")
+	diff := tr1.Subtract(tr2)
+	assert.Equal(t, diff.result, TimeRanges{makeTimeRangeHHMM("09:00", "11:00")})
+	assert.Equal(t, diff.remainingSubtractor, TimeRanges{makeTimeRangeHHMM("07:00", "08:00")})
+}
+
+// Tests for TimeRanges.Subtract
 func TestTimeRange1SupersedesTimeRange2(t *testing.T) {
 	tr1 := TimeRanges{makeTimeRangeHHMM("09:00", "10:00")}
 	tr2 := TimeRanges{makeTimeRangeHHMM("09:00", "09:30")}
