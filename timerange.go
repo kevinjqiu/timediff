@@ -252,5 +252,5 @@ func (trs TimeRanges) Subtract(subtractors TimeRanges) TimeRanges {
 		// fmt.Printf("subtractors=%v\n", subtractors)
 		// fmt.Println("##################")
 	}
-	return trs
+	return trs.Merge()
 }
