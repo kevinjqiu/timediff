@@ -153,11 +153,6 @@ func (trs TimeRanges) ReplaceAt(idx int, newTrs TimeRanges) TimeRanges {
 	return result
 }
 
-// IsEmpty returns true if the TimeRanges slice is empty
-func (trs TimeRanges) IsEmpty() bool {
-	return trs.Len() == 0
-}
-
 // Method to satisfy the Sort interface
 func (trs TimeRanges) Len() int {
 	return len(trs)
@@ -224,15 +219,6 @@ func (trs TimeRanges) Subtract(subtractors TimeRanges) TimeRanges {
 		tr := trs[i]
 		subtractor := subtractors[j]
 		diff = tr.Subtract(subtractor)
-		// fmt.Println("##################")
-		// fmt.Printf("i=%d\n", i)
-		// fmt.Printf("j=%d\n", j)
-		// fmt.Printf("trs=%v\n", trs)
-		// fmt.Printf("subtractors=%v\n", subtractors)
-		// fmt.Printf("tr=%v\n", tr)
-		// fmt.Printf("subtractor=%v\n", subtractor)
-		// fmt.Printf("diff=%v\n", diff)
-		// fmt.Println("-----------------")
 
 		trs = trs.ReplaceAt(i, diff.result)
 		if len(diff.result) >= 1 && diff.result[0] == tr {
@@ -244,13 +230,6 @@ func (trs TimeRanges) Subtract(subtractors TimeRanges) TimeRanges {
 			j++
 			continue
 		}
-
-		// fmt.Printf("i=%d\n", i)
-		// fmt.Printf("j=%d\n", j)
-		// fmt.Println("-----------------")
-		// fmt.Printf("trs=%v\n", trs)
-		// fmt.Printf("subtractors=%v\n", subtractors)
-		// fmt.Println("##################")
 	}
 	return trs.Merge()
 }
