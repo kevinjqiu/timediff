@@ -180,8 +180,28 @@ func (trs TimeRanges) Swap(i, j int) {
 }
 
 // Merge all the time ranges in this TimeRanges object
+// Precondition: the time ranges are sorted
 func (trs TimeRanges) Merge() TimeRanges {
-	return TimeRanges{}
+	if trs.Len() < 2 {
+		return trs
+	}
+
+	newTrs := TimeRanges{}
+	mergingTr := trs[0] // Keep a reference to the TimeRange currently being merged
+
+	for _, tr := range trs[1:] {
+		switch {
+		case tr.start.After(mergingTr.end):
+			newTrs = append(newTrs, mergingTr)
+			mergingTr = tr
+		case (tr.start.Before(mergingTr.end) || tr.start.Equal(mergingTr.end)) && (tr.end.After(mergingTr.end) || tr.end.Equal(mergingTr.end)):
+			mergingTr.end = tr.end
+		}
+	}
+
+	// Add the remaining
+	newTrs = append(newTrs, mergingTr)
+	return newTrs
 }
 
 // Subtract two TimeRanges object, returns a new TimeRanges object containing the result

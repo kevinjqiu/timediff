@@ -129,6 +129,20 @@ type timeRangeMergeTestCase struct {
 func TestTimeRangesMerge(t *testing.T) {
 	testCases := []timeRangeMergeTestCase{
 		timeRangeMergeTestCase{
+			description:    "no time ranges",
+			timeRanges:     TimeRanges{},
+			expectedResult: TimeRanges{},
+		},
+		timeRangeMergeTestCase{
+			description: "only one time range",
+			timeRanges: TimeRanges{
+				mktr("09:00", "10:00"),
+			},
+			expectedResult: TimeRanges{
+				mktr("09:00", "10:00"),
+			},
+		},
+		timeRangeMergeTestCase{
 			description: "no overlapping time ranges",
 			timeRanges: TimeRanges{
 				mktr("09:00", "10:00"),
