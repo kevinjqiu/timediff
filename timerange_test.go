@@ -213,6 +213,7 @@ func TestTimeRangesMerge(t *testing.T) {
 	}
 }
 
+// TODO: refactor this using test cases
 // Tests for TimeRanges.Subtract
 func TestTimeRange1SupersedesTimeRange2(t *testing.T) {
 	tr1 := TimeRanges{mktr("09:00", "10:00")}
