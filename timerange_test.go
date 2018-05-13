@@ -97,6 +97,20 @@ func TestTimeRangeSubtraction(t *testing.T) {
 			expectedResult:    TimeRanges{mktr("12:00", "13:00")},
 			expectedRemaining: TimeRanges{},
 		},
+		timeRangeSubtractTestCase{
+			description:       "Scenario 10 (s1>=e2)",
+			tr1:               mktr("09:00", "13:00"),
+			tr2:               mktr("05:00", "07:00"),
+			expectedResult:    TimeRanges{mktr("09:00", "13:00")},
+			expectedRemaining: TimeRanges{},
+		},
+		timeRangeSubtractTestCase{
+			description:       "Scenario 11 (s2>=e1)",
+			tr1:               mktr("09:00", "13:00"),
+			tr2:               mktr("15:00", "17:00"),
+			expectedResult:    TimeRanges{mktr("09:00", "13:00")},
+			expectedRemaining: TimeRanges{mktr("15:00", "17:00")},
+		},
 	}
 
 	for _, tc := range testCases {
