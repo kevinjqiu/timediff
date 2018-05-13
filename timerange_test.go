@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func makeHHMM(timeStr string) time.Time {
@@ -22,82 +23,87 @@ func mktr(start string, end string) TimeRange {
 	}
 }
 
-// Tests for TimeRange.Subtract
-// TR1:                |-------------|
-// TR2:                |-------------|
-// Result:             []
-// TR2 Remaining:      []
-func TestTimeRangeSubtractionSameRange(t *testing.T) {
-	tr1 := mktr("09:00", "10:00")
-	tr2 := mktr("09:00", "10:00")
-	diff := tr1.Subtract(tr2)
-	assert.Equal(t, diff.result, TimeRanges{})
-	assert.Equal(t, diff.remainingSubtractor, TimeRanges{})
+type timeRangeSubtractTestCase struct {
+	description                       string
+	tr1, tr2                          TimeRange
+	expectedResult, expectedRemaining TimeRanges
 }
 
-// TR1:                |-------------|
-// TR2:            |----------------------|
-// Result:         []
-// TR2 Remaining:                    |----|
-func TestTimeRangeSubtractionTR2EncompassesTR1(t *testing.T) {
-	tr1 := mktr("09:00", "10:00")
-	tr2 := mktr("08:00", "11:00")
-	diff := tr1.Subtract(tr2)
-	assert.Equal(t, diff.result, TimeRanges{})
-	assert.Equal(t, diff.remainingSubtractor, TimeRanges{
-		mktr("09:00", "11:00"),
-	})
-}
+func TestTimeRangeSubtraction(t *testing.T) {
+	testCases := []timeRangeSubtractTestCase{
+		timeRangeSubtractTestCase{
+			description:       "Scenario 1 (s1==s2 && e1==e2)",
+			tr1:               mktr("09:00", "10:00"),
+			tr2:               mktr("09:00", "10:00"),
+			expectedResult:    TimeRanges{},
+			expectedRemaining: TimeRanges{},
+		},
+		timeRangeSubtractTestCase{
+			description:       "Scenario 2 (s1==s2 && e1<e2)",
+			tr1:               mktr("09:00", "10:00"),
+			tr2:               mktr("09:00", "12:00"),
+			expectedResult:    TimeRanges{},
+			expectedRemaining: TimeRanges{mktr("10:00", "12:00")},
+		},
+		timeRangeSubtractTestCase{
+			description:       "Scenario 3 (s1==s2 && e1>e2)",
+			tr1:               mktr("09:00", "12:00"),
+			tr2:               mktr("09:00", "10:00"),
+			expectedResult:    TimeRanges{mktr("10:00", "12:00")},
+			expectedRemaining: TimeRanges{},
+		},
+		timeRangeSubtractTestCase{
+			description:       "Scenario 4 (s1<s2 && e1==e2)",
+			tr1:               mktr("08:00", "12:00"),
+			tr2:               mktr("09:00", "12:00"),
+			expectedResult:    TimeRanges{mktr("08:00", "09:00")},
+			expectedRemaining: TimeRanges{},
+		},
+		timeRangeSubtractTestCase{
+			description:       "Scenario 5 (s1>s2 && e1==e2)",
+			tr1:               mktr("08:00", "12:00"),
+			tr2:               mktr("07:00", "12:00"),
+			expectedResult:    TimeRanges{},
+			expectedRemaining: TimeRanges{},
+		},
+		timeRangeSubtractTestCase{
+			description:       "Scenario 6 (s1<s2 && e1<e2)",
+			tr1:               mktr("07:00", "11:00"),
+			tr2:               mktr("08:00", "12:00"),
+			expectedResult:    TimeRanges{mktr("07:00", "08:00")},
+			expectedRemaining: TimeRanges{mktr("11:00", "12:00")},
+		},
+		timeRangeSubtractTestCase{
+			description: "Scenario 7 (s1<s2 && e1>e2)",
+			tr1:         mktr("07:00", "13:00"),
+			tr2:         mktr("08:00", "12:00"),
+			expectedResult: TimeRanges{
+				mktr("07:00", "08:00"),
+				mktr("12:00", "13:00"),
+			},
+			expectedRemaining: TimeRanges{},
+		},
+		timeRangeSubtractTestCase{
+			description:       "Scenario 8 (s1>s2 && e1<e2)",
+			tr1:               mktr("09:00", "11:00"),
+			tr2:               mktr("08:00", "12:00"),
+			expectedResult:    TimeRanges{},
+			expectedRemaining: TimeRanges{mktr("11:00", "12:00")},
+		},
+		timeRangeSubtractTestCase{
+			description:       "Scenario 9 (s1>s2 && e1>e2)",
+			tr1:               mktr("09:00", "13:00"),
+			tr2:               mktr("08:00", "12:00"),
+			expectedResult:    TimeRanges{mktr("12:00", "13:00")},
+			expectedRemaining: TimeRanges{},
+		},
+	}
 
-// TR1:            |----------------------|
-// TR2:                |-------------|
-// Result:         |---|             |----|
-// TR2 Remaining:  []
-func TestTimeRangeSubtractionTR2BisectsTR1(t *testing.T) {
-	tr1 := mktr("08:00", "11:00")
-	tr2 := mktr("09:00", "10:00")
-	diff := tr1.Subtract(tr2)
-	assert.Equal(t, diff.result, TimeRanges{
-		mktr("08:00", "09:00"),
-		mktr("09:00", "11:00"),
-	})
-	assert.Equal(t, diff.remainingSubtractor, TimeRanges{})
-}
-
-// TR1:            |-----|
-// TR2:                    |-------------|
-// Result:         |-----|
-// TR2 Remaining:          |-------------|
-func TestTimeRangeSubtractionTR2DoesNotIntersectTR1(t *testing.T) {
-	tr1 := mktr("08:00", "11:00")
-	tr2 := mktr("12:00", "15:00")
-	diff := tr1.Subtract(tr2)
-	assert.Equal(t, diff.result, TimeRanges{tr1})
-	assert.Equal(t, diff.remainingSubtractor, TimeRanges{tr2})
-}
-
-// TR1:            |--------|
-// TR2:                |-------------|
-// Result:         |---|
-// TR2 Remaining:           |--------|
-func TestTimeRangeSubtractionTR2OverlapsAndIsLaterThanTR1(t *testing.T) {
-	tr1 := mktr("08:00", "11:00")
-	tr2 := mktr("10:00", "15:00")
-	diff := tr1.Subtract(tr2)
-	assert.Equal(t, diff.result, TimeRange{mktr("08:00", "10:00")})
-	assert.Equal(t, diff.remainingSubtractor, TimeRange{mktr("11:00", "15:00")})
-}
-
-// TR1:                    |--------|
-// TR2:            |-------------|
-// Result:                       |--|
-// TR2 Remaining:  []
-func TestTimeRangeSubtractionTR2OverlapsAndIsEarlierThanTR1(t *testing.T) {
-	tr1 := mktr("08:00", "11:00")
-	tr2 := mktr("07:00", "09:00")
-	diff := tr1.Subtract(tr2)
-	assert.Equal(t, diff.result, TimeRanges{mktr("09:00", "11:00")})
-	assert.Equal(t, diff.remainingSubtractor, TimeRanges{})
+	for _, tc := range testCases {
+		diff := tc.tr1.Subtract(tc.tr2)
+		assert.Equal(t, diff.result, tc.expectedResult, tc.description)
+		assert.Equal(t, diff.remainingSubtractor, tc.expectedRemaining, tc.description)
+	}
 }
 
 // Tests for TimeRanges.Subtract
