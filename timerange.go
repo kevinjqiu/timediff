@@ -199,16 +199,33 @@ func (trs TimeRanges) Subtract(subtractors TimeRanges) TimeRanges {
 		tr := trs[i]
 		subtractor := subtractors[j]
 		diff = tr.Subtract(subtractor)
+		//fmt.Println("##################")
+		//fmt.Printf("i=%d\n", i)
+		//fmt.Printf("j=%d\n", j)
+		//fmt.Printf("trs=%v\n", trs)
+		//fmt.Printf("subtractors=%v\n", subtractors)
+		//fmt.Printf("tr=%v\n", tr)
+		//fmt.Printf("subtractor=%v\n", subtractor)
+		//fmt.Printf("diff=%v\n", diff)
+		//fmt.Println("-----------------")
+
 		trs = trs.ReplaceAt(i, diff.result)
+		if len(diff.result) >= 1 && diff.result[0] == tr {
+			i++
+			continue
+		}
 		subtractors = subtractors.ReplaceAt(j, diff.remainingSubtractor)
-		fmt.Printf("i=%d\n", i)
-		fmt.Printf("j=%d\n", j)
-		fmt.Printf("tr=%v\n", tr)
-		fmt.Printf("subtractor=%v\n", subtractor)
-		fmt.Printf("diff=%v\n", diff)
-		fmt.Println("-----------------")
-		fmt.Printf("trs=%v\n", trs)
-		fmt.Printf("subtractors=%v\n", subtractors)
+		if len(diff.remainingSubtractor) == 1 && diff.remainingSubtractor[0] == subtractor {
+			j++
+			continue
+		}
+
+		//fmt.Printf("i=%d\n", i)
+		//fmt.Printf("j=%d\n", j)
+		//fmt.Println("-----------------")
+		//fmt.Printf("trs=%v\n", trs)
+		//fmt.Printf("subtractors=%v\n", subtractors)
+		//fmt.Println("##################")
 	}
 	return trs
 }
