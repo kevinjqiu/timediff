@@ -24,9 +24,10 @@ func mktr(start string, end string) TimeRange {
 }
 
 type timeRangeSubtractTestCase struct {
-	description                       string
-	tr1, tr2                          TimeRange
-	expectedResult, expectedRemaining TimeRanges
+	description       string
+	tr1, tr2          TimeRange
+	expectedResult    TimeRanges
+	expectedRemaining TimeRange
 }
 
 func TestTimeRangeSubtraction(t *testing.T) {
@@ -36,42 +37,42 @@ func TestTimeRangeSubtraction(t *testing.T) {
 			tr1:               mktr("09:00", "10:00"),
 			tr2:               mktr("09:00", "10:00"),
 			expectedResult:    TimeRanges{},
-			expectedRemaining: TimeRanges{},
+			expectedRemaining: TimeRange{},
 		},
 		timeRangeSubtractTestCase{
 			description:       "Scenario 2 (s1==s2 && e1<e2)",
 			tr1:               mktr("09:00", "10:00"),
 			tr2:               mktr("09:00", "12:00"),
 			expectedResult:    TimeRanges{},
-			expectedRemaining: TimeRanges{mktr("10:00", "12:00")},
+			expectedRemaining: mktr("10:00", "12:00"),
 		},
 		timeRangeSubtractTestCase{
 			description:       "Scenario 3 (s1==s2 && e1>e2)",
 			tr1:               mktr("09:00", "12:00"),
 			tr2:               mktr("09:00", "10:00"),
 			expectedResult:    TimeRanges{mktr("10:00", "12:00")},
-			expectedRemaining: TimeRanges{},
+			expectedRemaining: TimeRange{},
 		},
 		timeRangeSubtractTestCase{
 			description:       "Scenario 4 (s1<s2 && e1==e2)",
 			tr1:               mktr("08:00", "12:00"),
 			tr2:               mktr("09:00", "12:00"),
 			expectedResult:    TimeRanges{mktr("08:00", "09:00")},
-			expectedRemaining: TimeRanges{},
+			expectedRemaining: TimeRange{},
 		},
 		timeRangeSubtractTestCase{
 			description:       "Scenario 5 (s1>s2 && e1==e2)",
 			tr1:               mktr("08:00", "12:00"),
 			tr2:               mktr("07:00", "12:00"),
 			expectedResult:    TimeRanges{},
-			expectedRemaining: TimeRanges{},
+			expectedRemaining: TimeRange{},
 		},
 		timeRangeSubtractTestCase{
 			description:       "Scenario 6 (s1<s2 && e1<e2)",
 			tr1:               mktr("07:00", "11:00"),
 			tr2:               mktr("08:00", "12:00"),
 			expectedResult:    TimeRanges{mktr("07:00", "08:00")},
-			expectedRemaining: TimeRanges{mktr("11:00", "12:00")},
+			expectedRemaining: mktr("11:00", "12:00"),
 		},
 		timeRangeSubtractTestCase{
 			description: "Scenario 7 (s1<s2 && e1>e2)",
@@ -81,35 +82,35 @@ func TestTimeRangeSubtraction(t *testing.T) {
 				mktr("07:00", "08:00"),
 				mktr("12:00", "13:00"),
 			},
-			expectedRemaining: TimeRanges{},
+			expectedRemaining: TimeRange{},
 		},
 		timeRangeSubtractTestCase{
 			description:       "Scenario 8 (s1>s2 && e1<e2)",
 			tr1:               mktr("09:00", "11:00"),
 			tr2:               mktr("08:00", "12:00"),
 			expectedResult:    TimeRanges{},
-			expectedRemaining: TimeRanges{mktr("11:00", "12:00")},
+			expectedRemaining: mktr("11:00", "12:00"),
 		},
 		timeRangeSubtractTestCase{
 			description:       "Scenario 9 (s1>s2 && e1>e2)",
 			tr1:               mktr("09:00", "13:00"),
 			tr2:               mktr("08:00", "12:00"),
 			expectedResult:    TimeRanges{mktr("12:00", "13:00")},
-			expectedRemaining: TimeRanges{},
+			expectedRemaining: TimeRange{},
 		},
 		timeRangeSubtractTestCase{
 			description:       "Scenario 10 (s1>=e2)",
 			tr1:               mktr("09:00", "13:00"),
 			tr2:               mktr("05:00", "07:00"),
 			expectedResult:    TimeRanges{mktr("09:00", "13:00")},
-			expectedRemaining: TimeRanges{},
+			expectedRemaining: TimeRange{},
 		},
 		timeRangeSubtractTestCase{
 			description:       "Scenario 11 (s2>=e1)",
 			tr1:               mktr("09:00", "13:00"),
 			tr2:               mktr("15:00", "17:00"),
 			expectedResult:    TimeRanges{mktr("09:00", "13:00")},
-			expectedRemaining: TimeRanges{mktr("15:00", "17:00")},
+			expectedRemaining: mktr("15:00", "17:00"),
 		},
 	}
 

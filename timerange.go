@@ -9,11 +9,11 @@ import (
 // TimeRangeSubtractionResult represents the result of `TimeRange.Subtract` method
 type TimeRangeSubtractionResult struct {
 	result              TimeRanges // The result of applying tr1-tr2
-	remainingSubtractor TimeRanges // The remaining of tr2 after applying tr1-tr2 that's after the start of tr1
+	remainingSubtractor TimeRange  // The remaining of tr2 after applying tr1-tr2 that's after the start of tr1
 }
 
 func (trsr TimeRangeSubtractionResult) String() string {
-	return fmt.Sprintf("result=%v, remaining=%v", trsr.result, trsr.remainingSubtractor)
+	return fmt.Sprintf("{result=%v, remaining=%v}", trsr.result, trsr.remainingSubtractor)
 }
 
 // TimeRange represents a single TimeRange with start and end time
@@ -96,7 +96,7 @@ Let's denote `tr1(start=s1, end=e1)` and `tr2(start=e2, end=e2)` be the two Time
 func (tr TimeRange) Subtract(subtractor TimeRange) TimeRangeSubtractionResult {
 	result := TimeRangeSubtractionResult{
 		result:              TimeRanges{},
-		remainingSubtractor: TimeRanges{},
+		remainingSubtractor: TimeRange{},
 	}
 	s1 := tr.start
 	s2 := subtractor.start
@@ -107,7 +107,7 @@ func (tr TimeRange) Subtract(subtractor TimeRange) TimeRangeSubtractionResult {
 	case s1.Equal(s2) && e1.Equal(e2):
 		// Do nothing, as the default for result and remaining are empty TimeRanges slice
 	case s1.Equal(s2) && e1.Before(e2):
-		result.remainingSubtractor = TimeRanges{TimeRange{e1, e2}}
+		result.remainingSubtractor = TimeRange{e1, e2}
 	case s1.Equal(s2) && e1.After(e2):
 		result.result = TimeRanges{TimeRange{e2, e1}}
 	case s1.Before(s2) && e1.Equal(e2):
@@ -116,21 +116,21 @@ func (tr TimeRange) Subtract(subtractor TimeRange) TimeRangeSubtractionResult {
 		// Do nothing, as the default for result and remaining are empty TimeRanges slice
 	case s1.Before(s2) && e1.Before(e2) && s2.Before(e1):
 		result.result = TimeRanges{TimeRange{s1, s2}}
-		result.remainingSubtractor = TimeRanges{TimeRange{e1, e2}}
+		result.remainingSubtractor = TimeRange{e1, e2}
 	case s1.Before(s2) && e1.After(e2) && s2.Before(e1):
 		result.result = TimeRanges{
 			TimeRange{s1, s2},
 			TimeRange{e2, e1},
 		}
 	case s1.After(s2) && e1.Before(e2) && s1.Before(e2):
-		result.remainingSubtractor = TimeRanges{TimeRange{e1, e2}}
+		result.remainingSubtractor = TimeRange{e1, e2}
 	case s1.After(s2) && e1.After(e2) && s1.Before(e2):
 		result.result = TimeRanges{TimeRange{e2, e1}}
 	case s1.After(e2) || s1.Equal(e2):
 		result.result = TimeRanges{TimeRange{s1, e1}}
 	case s2.After(e1) || s2.Equal(e1):
 		result.result = TimeRanges{TimeRange{s1, e1}}
-		result.remainingSubtractor = TimeRanges{TimeRange{s2, e2}}
+		result.remainingSubtractor = TimeRange{s2, e2}
 	default:
 		panic("Shouldn't reach here. Were there missing scenarios?")
 	}
@@ -221,13 +221,15 @@ func (trs TimeRanges) Subtract(subtractors TimeRanges) TimeRanges {
 		diff = tr.Subtract(subtractor)
 
 		trs = trs.ReplaceAt(i, diff.result)
-		subtractors = subtractors.ReplaceAt(j, diff.remainingSubtractor)
+		subtractors = subtractors.ReplaceAt(j, TimeRanges{diff.remainingSubtractor})
 
 		if len(diff.result) >= 1 && diff.result[0] == tr {
+			fmt.Println("i++")
 			i++
 			continue
 		}
-		if len(diff.remainingSubtractor) == 1 && diff.remainingSubtractor[0] == subtractor {
+		if diff.remainingSubtractor == subtractor {
+			fmt.Println("j++")
 			j++
 			continue
 		}
