@@ -146,7 +146,13 @@ type TimeRanges []TimeRange
 
 // ReplaceAt replaces the element at idx with elements in the newTrs
 func (trs TimeRanges) ReplaceAt(idx int, newTrs TimeRanges) TimeRanges {
-	result := append(trs[0:idx], newTrs...)
+	empty := TimeRange{}
+	result := trs[0:idx]
+	for _, tr := range newTrs {
+		if tr != empty {
+			result = append(result, tr)
+		}
+	}
 	if idx <= len(trs)-1 {
 		result = append(result, trs[idx+1:len(trs)]...)
 	}
@@ -220,16 +226,23 @@ func (trs TimeRanges) Subtract(subtractors TimeRanges) TimeRanges {
 		subtractor := subtractors[j]
 		diff = tr.Subtract(subtractor)
 
+		// fmt.Println("==================================================================")
+		// fmt.Printf("i,j=%d,%d\n", i, j)
+		// fmt.Printf("trs=%v\n", trs)
+		// fmt.Printf("subtractors=%v\n", subtractors)
+		// fmt.Printf("%v - %v = %v\n", tr, subtractor, diff)
+
 		trs = trs.ReplaceAt(i, diff.result)
 		subtractors = subtractors.ReplaceAt(j, TimeRanges{diff.remainingSubtractor})
 
+		// fmt.Println("-----------------------------------------------")
+		// fmt.Printf("trs=%v\n", trs)
+		// fmt.Printf("subtractors=%v\n", subtractors)
 		if len(diff.result) >= 1 && diff.result[0] == tr {
-			fmt.Println("i++")
 			i++
 			continue
 		}
 		if diff.remainingSubtractor == subtractor {
-			fmt.Println("j++")
 			j++
 			continue
 		}
