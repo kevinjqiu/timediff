@@ -12,6 +12,10 @@ type TimeRangeSubtractionResult struct {
 	remainingSubtractor TimeRanges // The remaining of tr2 after applying tr1-tr2 that's after the start of tr1
 }
 
+func (trsr TimeRangeSubtractionResult) String() string {
+	return fmt.Sprintf("result=%v, remaining=%v", trsr.result, trsr.remainingSubtractor)
+}
+
 // TimeRange represents a single TimeRange with start and end time
 type TimeRange struct {
 	start time.Time
