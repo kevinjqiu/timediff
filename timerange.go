@@ -18,7 +18,21 @@ type TimeRange struct {
 }
 
 func (tr TimeRange) Subtract(other TimeRange) TimeRangeSubtractionResult {
-	return TimeRangeSubtractionResult{}
+	result := TimeRangeSubtractionResult{}
+	// s1, e1, s2, e2
+	// s1, s2, e1, e2
+	// s1, s2, e2, e1
+	// s2, e2, s1, e1
+	// s2, s1, e1, e2
+	// s2, s1, e2, e1
+	// s1==s2, e1, e2
+	// s1==s2, e2, e1
+	// s1, s2, e1==e2
+	// s2, s1, e1==e2
+	if tr.start.Before(other.start) && tr.end {
+
+	}
+	return result
 }
 
 func (tr TimeRange) String() string {
