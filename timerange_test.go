@@ -120,6 +120,85 @@ func TestTimeRangeSubtraction(t *testing.T) {
 	}
 }
 
+type timeRangeMergeTestCase struct {
+	description    string
+	timeRanges     TimeRanges
+	expectedResult TimeRanges
+}
+
+func TestTimeRangesMerge(t *testing.T) {
+	testCases := []timeRangeMergeTestCase{
+		timeRangeMergeTestCase{
+			description: "no overlapping time ranges",
+			timeRanges: TimeRanges{
+				mktr("09:00", "10:00"),
+				mktr("11:00", "12:00"),
+			},
+			expectedResult: TimeRanges{
+				mktr("09:00", "10:00"),
+				mktr("11:00", "12:00"),
+			},
+		},
+		timeRangeMergeTestCase{
+			description: "connected time ranges",
+			timeRanges: TimeRanges{
+				mktr("09:00", "11:00"),
+				mktr("11:00", "12:00"),
+			},
+			expectedResult: TimeRanges{
+				mktr("09:00", "12:00"),
+			},
+		},
+		timeRangeMergeTestCase{
+			description: "equal time ranges",
+			timeRanges: TimeRanges{
+				mktr("09:00", "11:00"),
+				mktr("09:00", "11:00"),
+			},
+			expectedResult: TimeRanges{
+				mktr("09:00", "11:00"),
+			},
+		},
+		timeRangeMergeTestCase{
+			description: "second time range falls completely within the first one",
+			timeRanges: TimeRanges{
+				mktr("09:00", "12:00"),
+				mktr("09:30", "11:00"),
+			},
+			expectedResult: TimeRanges{
+				mktr("09:00", "12:00"),
+			},
+		},
+		timeRangeMergeTestCase{
+			description: "overlapping time ranges",
+			timeRanges: TimeRanges{
+				mktr("09:00", "12:00"),
+				mktr("09:45", "13:00"),
+			},
+			expectedResult: TimeRanges{
+				mktr("09:00", "13:00"),
+			},
+		},
+		timeRangeMergeTestCase{
+			description: "multiple time ranges",
+			timeRanges: TimeRanges{
+				mktr("09:00", "12:00"),
+				mktr("09:45", "13:00"),
+				mktr("10:45", "15:00"),
+				mktr("17:45", "18:00"),
+			},
+			expectedResult: TimeRanges{
+				mktr("09:00", "15:00"),
+				mktr("17:45", "18:00"),
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		assert.Equal(t, tc.expectedResult, tc.timeRanges.Merge(), tc.description)
+	}
+}
+
 // Tests for TimeRanges.Subtract
 func TestTimeRange1SupersedesTimeRange2(t *testing.T) {
 	tr1 := TimeRanges{mktr("09:00", "10:00")}

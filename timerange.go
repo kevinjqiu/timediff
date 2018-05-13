@@ -179,6 +179,11 @@ func (trs TimeRanges) Swap(i, j int) {
 	trs[i], trs[j] = trs[j], trs[i]
 }
 
+// Merge all the time ranges in this TimeRanges object
+func (trs TimeRanges) Merge() TimeRanges {
+	return TimeRanges{}
+}
+
 // Subtract two TimeRanges object, returns a new TimeRanges object containing the result
 func (trs TimeRanges) Subtract(subtractors TimeRanges) TimeRanges {
 	sort.Sort(trs)
@@ -199,15 +204,15 @@ func (trs TimeRanges) Subtract(subtractors TimeRanges) TimeRanges {
 		tr := trs[i]
 		subtractor := subtractors[j]
 		diff = tr.Subtract(subtractor)
-		//fmt.Println("##################")
-		//fmt.Printf("i=%d\n", i)
-		//fmt.Printf("j=%d\n", j)
-		//fmt.Printf("trs=%v\n", trs)
-		//fmt.Printf("subtractors=%v\n", subtractors)
-		//fmt.Printf("tr=%v\n", tr)
-		//fmt.Printf("subtractor=%v\n", subtractor)
-		//fmt.Printf("diff=%v\n", diff)
-		//fmt.Println("-----------------")
+		// fmt.Println("##################")
+		// fmt.Printf("i=%d\n", i)
+		// fmt.Printf("j=%d\n", j)
+		// fmt.Printf("trs=%v\n", trs)
+		// fmt.Printf("subtractors=%v\n", subtractors)
+		// fmt.Printf("tr=%v\n", tr)
+		// fmt.Printf("subtractor=%v\n", subtractor)
+		// fmt.Printf("diff=%v\n", diff)
+		// fmt.Println("-----------------")
 
 		trs = trs.ReplaceAt(i, diff.result)
 		if len(diff.result) >= 1 && diff.result[0] == tr {
@@ -220,12 +225,12 @@ func (trs TimeRanges) Subtract(subtractors TimeRanges) TimeRanges {
 			continue
 		}
 
-		//fmt.Printf("i=%d\n", i)
-		//fmt.Printf("j=%d\n", j)
-		//fmt.Println("-----------------")
-		//fmt.Printf("trs=%v\n", trs)
-		//fmt.Printf("subtractors=%v\n", subtractors)
-		//fmt.Println("##################")
+		// fmt.Printf("i=%d\n", i)
+		// fmt.Printf("j=%d\n", j)
+		// fmt.Println("-----------------")
+		// fmt.Printf("trs=%v\n", trs)
+		// fmt.Printf("subtractors=%v\n", subtractors)
+		// fmt.Println("##################")
 	}
 	return trs
 }
