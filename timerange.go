@@ -226,18 +226,18 @@ func (trs TimeRanges) Subtract(subtractors TimeRanges) TimeRanges {
 		subtractor := subtractors[j]
 		diff = tr.Subtract(subtractor)
 
-		// fmt.Println("==================================================================")
-		// fmt.Printf("i,j=%d,%d\n", i, j)
-		// fmt.Printf("trs=%v\n", trs)
-		// fmt.Printf("subtractors=%v\n", subtractors)
-		// fmt.Printf("%v - %v = %v\n", tr, subtractor, diff)
+		fmt.Println("==================================================================")
+		fmt.Printf("i,j=%d,%d\n", i, j)
+		fmt.Printf("trs=%v\n", trs)
+		fmt.Printf("subtractors=%v\n", subtractors)
+		fmt.Printf("%v - %v = %v\n", tr, subtractor, diff)
 
 		trs = trs.ReplaceAt(i, diff.result)
 		subtractors = subtractors.ReplaceAt(j, TimeRanges{diff.remainingSubtractor})
 
-		// fmt.Println("-----------------------------------------------")
-		// fmt.Printf("trs=%v\n", trs)
-		// fmt.Printf("subtractors=%v\n", subtractors)
+		fmt.Println("-----------------------------------------------")
+		fmt.Printf("trs=%v\n", trs)
+		fmt.Printf("subtractors=%v\n", subtractors)
 		if len(diff.result) >= 1 && diff.result[0] == tr {
 			i++
 			continue
