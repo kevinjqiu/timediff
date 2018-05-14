@@ -1,4 +1,4 @@
-package main
+package timerangesubtraction
 
 import (
 	"testing"
