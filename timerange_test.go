@@ -222,92 +222,92 @@ type TimeRangesSubtractTestCase struct {
 
 func TestTimeRangesSubtraction(t *testing.T) {
 	testCases := []TimeRangesSubtractTestCase{
-		// TimeRangesSubtractTestCase{
-		// 	description:    "tr1 supersedes tr2",
-		// 	tr1:            TimeRanges{mktr("09:00", "10:00")},
-		// 	tr2:            TimeRanges{mktr("09:00", "09:30")},
-		// 	expectedResult: TimeRanges{mktr("09:30", "10:00")},
-		// },
-		// TimeRangesSubtractTestCase{
-		// 	description:    "tr1 equals tr2",
-		// 	tr1:            TimeRanges{mktr("09:30", "10:30")},
-		// 	tr2:            TimeRanges{mktr("09:30", "10:30")},
-		// 	expectedResult: TimeRanges{},
-		// },
-		// TimeRangesSubtractTestCase{
-		// 	description:    "tr1 borders tr2",
-		// 	tr1:            TimeRanges{mktr("09:00", "09:30")},
-		// 	tr2:            TimeRanges{mktr("09:30", "15:00")},
-		// 	expectedResult: TimeRanges{mktr("09:00", "09:30")},
-		// },
-		// TimeRangesSubtractTestCase{
-		// 	description:    "tr1 and tr2 do not intersect",
-		// 	tr1:            TimeRanges{mktr("09:00", "09:30")},
-		// 	tr2:            TimeRanges{mktr("09:31", "15:00")},
-		// 	expectedResult: TimeRanges{mktr("09:00", "09:30")},
-		// },
-		// TimeRangesSubtractTestCase{
-		// 	description: "multiple overlapping time ranges",
-		// 	tr1: TimeRanges{
-		// 		mktr("09:00", "09:30"),
-		// 		mktr("10:00", "10:30"),
-		// 	},
-		// 	tr2: TimeRanges{
-		// 		mktr("09:15", "10:15"),
-		// 	},
-		// 	expectedResult: TimeRanges{
-		// 		mktr("09:00", "09:15"),
-		// 		mktr("10:15", "10:30"),
-		// 	},
-		// },
-		// TimeRangesSubtractTestCase{
-		// 	description: "multiple overlapping time ranges",
-		// 	tr1: TimeRanges{
-		// 		mktr("09:00", "11:00"),
-		// 		mktr("13:00", "15:00"),
-		// 	},
-		// 	tr2: TimeRanges{
-		// 		mktr("09:00", "09:15"),
-		// 		mktr("10:00", "10:15"),
-		// 		mktr("12:30", "16:00"),
-		// 	},
-		// 	expectedResult: TimeRanges{
-		// 		mktr("09:15", "10:00"),
-		// 		mktr("10:15", "11:00"),
-		// 	},
-		// },
-		// TimeRangesSubtractTestCase{
-		// 	description: "multiple time ranges subtraction",
-		// 	tr1: TimeRanges{
-		// 		mktr("09:00", "11:00"),
-		// 		mktr("13:00", "15:00"),
-		// 	},
-		// 	tr2: TimeRanges{
-		// 		mktr("09:00", "09:15"),
-		// 		mktr("10:00", "10:15"),
-		// 		mktr("12:30", "16:00"),
-		// 	},
-		// 	expectedResult: TimeRanges{
-		// 		mktr("09:15", "10:00"),
-		// 		mktr("10:15", "11:00"),
-		// 	},
-		// },
-		// TimeRangesSubtractTestCase{
-		// 	description: "multiple out-of-order time ranges subtraction",
-		// 	tr1: TimeRanges{
-		// 		mktr("13:00", "15:00"),
-		// 		mktr("09:00", "11:00"),
-		// 	},
-		// 	tr2: TimeRanges{
-		// 		mktr("10:00", "10:15"),
-		// 		mktr("09:00", "09:15"),
-		// 		mktr("12:30", "16:00"),
-		// 	},
-		// 	expectedResult: TimeRanges{
-		// 		mktr("09:15", "10:00"),
-		// 		mktr("10:15", "11:00"),
-		// 	},
-		// },
+		TimeRangesSubtractTestCase{
+			description:    "tr1 supersedes tr2",
+			tr1:            TimeRanges{mktr("09:00", "10:00")},
+			tr2:            TimeRanges{mktr("09:00", "09:30")},
+			expectedResult: TimeRanges{mktr("09:30", "10:00")},
+		},
+		TimeRangesSubtractTestCase{
+			description:    "tr1 equals tr2",
+			tr1:            TimeRanges{mktr("09:30", "10:30")},
+			tr2:            TimeRanges{mktr("09:30", "10:30")},
+			expectedResult: TimeRanges{},
+		},
+		TimeRangesSubtractTestCase{
+			description:    "tr1 borders tr2",
+			tr1:            TimeRanges{mktr("09:00", "09:30")},
+			tr2:            TimeRanges{mktr("09:30", "15:00")},
+			expectedResult: TimeRanges{mktr("09:00", "09:30")},
+		},
+		TimeRangesSubtractTestCase{
+			description:    "tr1 and tr2 do not intersect",
+			tr1:            TimeRanges{mktr("09:00", "09:30")},
+			tr2:            TimeRanges{mktr("09:31", "15:00")},
+			expectedResult: TimeRanges{mktr("09:00", "09:30")},
+		},
+		TimeRangesSubtractTestCase{
+			description: "multiple overlapping time ranges",
+			tr1: TimeRanges{
+				mktr("09:00", "09:30"),
+				mktr("10:00", "10:30"),
+			},
+			tr2: TimeRanges{
+				mktr("09:15", "10:15"),
+			},
+			expectedResult: TimeRanges{
+				mktr("09:00", "09:15"),
+				mktr("10:15", "10:30"),
+			},
+		},
+		TimeRangesSubtractTestCase{
+			description: "multiple overlapping time ranges",
+			tr1: TimeRanges{
+				mktr("09:00", "11:00"),
+				mktr("13:00", "15:00"),
+			},
+			tr2: TimeRanges{
+				mktr("09:00", "09:15"),
+				mktr("10:00", "10:15"),
+				mktr("12:30", "16:00"),
+			},
+			expectedResult: TimeRanges{
+				mktr("09:15", "10:00"),
+				mktr("10:15", "11:00"),
+			},
+		},
+		TimeRangesSubtractTestCase{
+			description: "multiple time ranges subtraction",
+			tr1: TimeRanges{
+				mktr("09:00", "11:00"),
+				mktr("13:00", "15:00"),
+			},
+			tr2: TimeRanges{
+				mktr("09:00", "09:15"),
+				mktr("10:00", "10:15"),
+				mktr("12:30", "16:00"),
+			},
+			expectedResult: TimeRanges{
+				mktr("09:15", "10:00"),
+				mktr("10:15", "11:00"),
+			},
+		},
+		TimeRangesSubtractTestCase{
+			description: "multiple out-of-order time ranges subtraction",
+			tr1: TimeRanges{
+				mktr("13:00", "15:00"),
+				mktr("09:00", "11:00"),
+			},
+			tr2: TimeRanges{
+				mktr("10:00", "10:15"),
+				mktr("09:00", "09:15"),
+				mktr("12:30", "16:00"),
+			},
+			expectedResult: TimeRanges{
+				mktr("09:15", "10:00"),
+				mktr("10:15", "11:00"),
+			},
+		},
 		TimeRangesSubtractTestCase{
 			description: "tr2 starts before tr1",
 			tr1: TimeRanges{

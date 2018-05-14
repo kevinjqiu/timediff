@@ -12,6 +12,11 @@ type TimeRangeSubtractionResult struct {
 	remainingSubtractor TimeRange  // The remaining of tr2 after applying tr1-tr2 that's after the start of tr1
 }
 
+// HasRemainingSubtractor returns true if the remainingSubtractor is empty
+func (trsr TimeRangeSubtractionResult) HasRemainingSubtractor() bool {
+	return trsr.remainingSubtractor != TimeRange{}
+}
+
 func (trsr TimeRangeSubtractionResult) String() string {
 	return fmt.Sprintf("{result=%v, remaining=%v}", trsr.result, trsr.remainingSubtractor)
 }
@@ -226,26 +231,16 @@ func (trs TimeRanges) Subtract(subtractors TimeRanges) TimeRanges {
 		subtractor := subtractors[j]
 		diff = tr.Subtract(subtractor)
 
-		fmt.Println("==================================================================")
-		fmt.Printf("i,j=%d,%d\n", i, j)
-		fmt.Printf("trs=%v\n", trs)
-		fmt.Printf("subtractors=%v\n", subtractors)
-		fmt.Printf("%v - %v = %v\n", tr, subtractor, diff)
-
 		trs = trs.ReplaceAt(i, diff.result)
-		subtractors = subtractors.ReplaceAt(j, TimeRanges{diff.remainingSubtractor})
-
-		fmt.Println("-----------------------------------------------")
-		fmt.Printf("trs=%v\n", trs)
-		fmt.Printf("subtractors=%v\n", subtractors)
-
-		if len(diff.result) >= 1 && diff.result[0] == tr {
-			i++
-			continue
-		}
-		if diff.remainingSubtractor == subtractor {
+		if !diff.HasRemainingSubtractor() {
+			// If the subtractor is totally consumed, move the subtractor pointer
+			// and keep the subtractee (trs) pointer untouched
 			j++
 			continue
+		}
+		subtractors = subtractors.ReplaceAt(j, TimeRanges{diff.remainingSubtractor})
+		if len(diff.result) >= 1 && diff.result[0] == tr {
+			i++
 		}
 	}
 	return trs.Merge()
