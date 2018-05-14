@@ -23,8 +23,8 @@ func (trsr TimeRangeSubtractionResult) String() string {
 
 // TimeRange represents a single TimeRange with start and end time
 type TimeRange struct {
-	start time.Time
-	end   time.Time
+	Start time.Time
+	End   time.Time
 }
 
 /*
@@ -103,10 +103,10 @@ func (tr TimeRange) Subtract(subtractor TimeRange) TimeRangeSubtractionResult {
 		result:              TimeRanges{},
 		remainingSubtractor: TimeRange{},
 	}
-	s1 := tr.start
-	s2 := subtractor.start
-	e1 := tr.end
-	e2 := subtractor.end
+	s1 := tr.Start
+	s2 := subtractor.Start
+	e1 := tr.End
+	e2 := subtractor.End
 
 	switch {
 	case s1.Equal(s2) && e1.Equal(e2):
@@ -143,7 +143,7 @@ func (tr TimeRange) Subtract(subtractor TimeRange) TimeRangeSubtractionResult {
 }
 
 func (tr TimeRange) String() string {
-	return fmt.Sprintf("(%s - %s)", tr.start.Format("15:04"), tr.end.Format("15:04"))
+	return fmt.Sprintf("(%s - %s)", tr.Start.Format("15:04"), tr.End.Format("15:04"))
 }
 
 // TimeRanges represents a list of TimeRanges
@@ -171,13 +171,13 @@ func (trs TimeRanges) Len() int {
 
 // Method to satisfy the Sort interface
 func (trs TimeRanges) Less(i, j int) bool {
-	if trs[i].start.Before(trs[j].start) {
+	if trs[i].Start.Before(trs[j].Start) {
 		return true
 	}
-	if trs[i].start.After(trs[j].start) {
+	if trs[i].Start.After(trs[j].Start) {
 		return false
 	}
-	return trs[i].end.Before(trs[j].end)
+	return trs[i].End.Before(trs[j].End)
 }
 
 // Method to satisfy the Sort interface
@@ -197,11 +197,11 @@ func (trs TimeRanges) Merge() TimeRanges {
 
 	for _, tr := range trs[1:] {
 		switch {
-		case tr.start.After(mergingTr.end):
+		case tr.Start.After(mergingTr.End):
 			newTrs = append(newTrs, mergingTr)
 			mergingTr = tr
-		case (tr.start.Before(mergingTr.end) || tr.start.Equal(mergingTr.end)) && (tr.end.After(mergingTr.end) || tr.end.Equal(mergingTr.end)):
-			mergingTr.end = tr.end
+		case (tr.Start.Before(mergingTr.End) || tr.Start.Equal(mergingTr.End)) && (tr.End.After(mergingTr.End) || tr.End.Equal(mergingTr.End)):
+			mergingTr.End = tr.End
 		}
 	}
 
