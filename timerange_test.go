@@ -214,81 +214,104 @@ func TestTimeRangesMerge(t *testing.T) {
 	}
 }
 
-// TODO: refactor this using test cases
-// Tests for TimeRanges.Subtract
-func TestTimeRange1SupersedesTimeRange2(t *testing.T) {
-	tr1 := TimeRanges{mktr("09:00", "10:00")}
-	tr2 := TimeRanges{mktr("09:00", "09:30")}
-	trdiff := tr1.Subtract(tr2)
-	assert.Equal(t, trdiff, TimeRanges{mktr("09:30", "10:00")})
+type TimeRangesSubtractTestCase struct {
+	description    string
+	tr1, tr2       TimeRanges
+	expectedResult TimeRanges
 }
 
-func TestTimeRange1EqualsTimeRange2(t *testing.T) {
-	tr1 := TimeRanges{mktr("09:30", "10:30")}
-	tr2 := TimeRanges{mktr("09:30", "10:30")}
-	trdiff := tr1.Subtract(tr2)
-	assert.Equal(t, trdiff, TimeRanges{})
-}
+func TestTimeRangesSubtraction(t *testing.T) {
+	testCases := []TimeRangesSubtractTestCase{
+		TimeRangesSubtractTestCase{
+			description:    "tr1 supersedes tr2",
+			tr1:            TimeRanges{mktr("09:00", "10:00")},
+			tr2:            TimeRanges{mktr("09:00", "09:30")},
+			expectedResult: TimeRanges{mktr("09:30", "10:00")},
+		},
+		TimeRangesSubtractTestCase{
+			description:    "tr1 equals tr2",
+			tr1:            TimeRanges{mktr("09:30", "10:30")},
+			tr2:            TimeRanges{mktr("09:30", "10:30")},
+			expectedResult: TimeRanges{},
+		},
+		TimeRangesSubtractTestCase{
+			description:    "tr1 borders tr2",
+			tr1:            TimeRanges{mktr("09:00", "09:30")},
+			tr2:            TimeRanges{mktr("09:30", "15:00")},
+			expectedResult: TimeRanges{mktr("09:00", "09:30")},
+		},
+		TimeRangesSubtractTestCase{
+			description:    "tr1 and tr2 do not intersect",
+			tr1:            TimeRanges{mktr("09:00", "09:30")},
+			tr2:            TimeRanges{mktr("09:31", "15:00")},
+			expectedResult: TimeRanges{mktr("09:00", "09:30")},
+		},
+		TimeRangesSubtractTestCase{
+			description: "multiple overlapping time ranges",
+			tr1: TimeRanges{
+				mktr("09:00", "09:30"),
+				mktr("10:00", "10:30"),
+			},
+			tr2: TimeRanges{
+				mktr("09:15", "10:15"),
+			},
+			expectedResult: TimeRanges{
+				mktr("09:00", "09:15"),
+				mktr("10:15", "10:30"),
+			},
+		},
+		TimeRangesSubtractTestCase{
+			description: "multiple overlapping time ranges",
+			tr1: TimeRanges{
+				mktr("09:00", "11:00"),
+				mktr("13:00", "15:00"),
+			},
+			tr2: TimeRanges{
+				mktr("09:00", "09:15"),
+				mktr("10:00", "10:15"),
+				mktr("12:30", "16:00"),
+			},
+			expectedResult: TimeRanges{
+				mktr("09:15", "10:00"),
+				mktr("10:15", "11:00"),
+			},
+		},
+		TimeRangesSubtractTestCase{
+			description: "multiple time ranges subtraction",
+			tr1: TimeRanges{
+				mktr("09:00", "11:00"),
+				mktr("13:00", "15:00"),
+			},
+			tr2: TimeRanges{
+				mktr("09:00", "09:15"),
+				mktr("10:00", "10:15"),
+				mktr("12:30", "16:00"),
+			},
+			expectedResult: TimeRanges{
+				mktr("09:15", "10:00"),
+				mktr("10:15", "11:00"),
+			},
+		},
+		TimeRangesSubtractTestCase{
+			description: "multiple out-of-order time ranges subtraction",
+			tr1: TimeRanges{
+				mktr("13:00", "15:00"),
+				mktr("09:00", "11:00"),
+			},
+			tr2: TimeRanges{
+				mktr("10:00", "10:15"),
+				mktr("09:00", "09:15"),
+				mktr("12:30", "16:00"),
+			},
+			expectedResult: TimeRanges{
+				mktr("09:15", "10:00"),
+				mktr("10:15", "11:00"),
+			},
+		},
+	}
 
-func TestTimeRange1BoardersTimeRange2(t *testing.T) {
-	tr1 := TimeRanges{mktr("09:00", "09:30")}
-	tr2 := TimeRanges{mktr("09:30", "15:00")}
-	trdiff := tr1.Subtract(tr2)
-	assert.Equal(t, trdiff, TimeRanges{mktr("09:00", "09:30")})
-}
-
-func TestTimeRangesDoNotIntersect(t *testing.T) {
-	tr1 := TimeRanges{mktr("09:00", "09:30")}
-	tr2 := TimeRanges{mktr("09:31", "15:00")}
-	trdiff := tr1.Subtract(tr2)
-	assert.Equal(t, trdiff, TimeRanges{mktr("09:00", "09:30")})
-}
-
-func TestMultiTimeRangeOverlap(t *testing.T) {
-	tr1 := TimeRanges{
-		mktr("09:00", "09:30"),
-		mktr("10:00", "10:30"),
+	for _, tc := range testCases {
+		trdiff := tc.tr1.Subtract(tc.tr2)
+		assert.Equal(t, tc.expectedResult, trdiff, tc.description)
 	}
-	tr2 := TimeRanges{
-		mktr("09:15", "10:15"),
-	}
-	trdiff := tr1.Subtract(tr2)
-	assert.Equal(t, trdiff, TimeRanges{
-		mktr("09:00", "09:15"),
-		mktr("10:15", "10:30"),
-	})
-}
-
-func TestMultiTimeRangeSubtraction(t *testing.T) {
-	tr1 := TimeRanges{
-		mktr("09:00", "11:00"),
-		mktr("13:00", "15:00"),
-	}
-	tr2 := TimeRanges{
-		mktr("09:00", "09:15"),
-		mktr("10:00", "10:15"),
-		mktr("12:30", "16:00"),
-	}
-	trdiff := tr1.Subtract(tr2)
-	assert.Equal(t, trdiff, TimeRanges{
-		mktr("09:15", "10:00"),
-		mktr("10:15", "11:00"),
-	})
-}
-
-func TestMultiTimeRangeSubtractionOutOfOrder(t *testing.T) {
-	tr1 := TimeRanges{
-		mktr("13:00", "15:00"),
-		mktr("09:00", "11:00"),
-	}
-	tr2 := TimeRanges{
-		mktr("10:00", "10:15"),
-		mktr("09:00", "09:15"),
-		mktr("12:30", "16:00"),
-	}
-	trdiff := tr1.Subtract(tr2)
-	assert.Equal(t, trdiff, TimeRanges{
-		mktr("09:15", "10:00"),
-		mktr("10:15", "11:00"),
-	})
 }
