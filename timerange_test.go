@@ -308,6 +308,23 @@ func TestTimeRangesSubtraction(t *testing.T) {
 				mktr("10:15", "11:00"),
 			},
 		},
+		TimeRangesSubtractTestCase{
+			description: "tr2 starts before tr1",
+			tr1: TimeRanges{
+				mktr("09:00", "11:00"),
+				mktr("13:00", "15:00"),
+			},
+			tr2: TimeRanges{
+				mktr("01:45", "5:30"),
+				mktr("05:45", "6:30"),
+				mktr("08:45", "09:30"),
+				mktr("14:30", "16:00"),
+			},
+			expectedResult: TimeRanges{
+				mktr("09:30", "11:00"),
+				mktr("13:00", "14:30"),
+			},
+		},
 	}
 
 	for _, tc := range testCases {
