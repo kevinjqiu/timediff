@@ -88,7 +88,7 @@ Example:
 How Does It Work
 ----------------
 
-Let's take the above `TimeRange`s as a demonstration.
+Let's take the above `TimeRange`s as an example.
 
     trs1=[(09:00-11:00), (13:00-15:00)] 
     trs2=[(09:00-09:15), (10:00-10:15), (12:30-16:00)]
@@ -216,7 +216,7 @@ After this iteration, `trs1` is:
 
 ### Iteration 6 (i=2, j=2)
 
-`i` now is out of bound for `trs1`, so we break out of the loop.
+`i` is now out of bound for `trs1`, so we break out of the loop.
 
 ### Return current trs1
 
