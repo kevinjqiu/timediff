@@ -238,6 +238,7 @@ func (trs TimeRanges) Subtract(subtractors TimeRanges) TimeRanges {
 		fmt.Println("-----------------------------------------------")
 		fmt.Printf("trs=%v\n", trs)
 		fmt.Printf("subtractors=%v\n", subtractors)
+
 		if len(diff.result) >= 1 && diff.result[0] == tr {
 			i++
 			continue
